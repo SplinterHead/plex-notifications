@@ -1,0 +1,35 @@
+.content {
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 10px;
+
+    color: white;
+    background-color: rgba(68,85,96);
+
+    /*font-family: sans-serif;*/
+    font-family: Open Sans Regular,Helvetica Neue,Helvetica,Arial,sans-serif;
+
+}
+
+.card {
+    margin: 0 0 20px 0;
+    background-color: rgba(0,0,0,0.4);
+    box-shadow: 0 4px 8px 0 rgba(0,0,0);
+}
+
+.poster {
+    display: block;
+    margin: 0 auto;
+    padding-top: 10px;
+
+    width: 20%;
+    height: auto;
+    max-width: 300px;
+    max-height: 450px;
+}
+
+.info-cell {
+    text-align: center;
+    padding: 0 5% 15px 5%;
+}

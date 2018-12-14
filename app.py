@@ -1,17 +1,10 @@
-import os
 import time
-import base64
-import shutil
-import random
-import string
-import urllib.request
 import datetime
 from plexapi.server import PlexServer
 
-notification_period = 7 # days
-base_url = 'http://<IP ADDRESS>:32400'
-token = 'API_TOKEN'
-image_path = 'images'
+notification_period = 7  # days
+base_url = 'http://<SERVER_ADDRESS>:32400'
+token = '<PLEX TOKEN>'
 
 
 def date_to_epoch(timestamp):
@@ -23,27 +16,19 @@ def date_to_epoch(timestamp):
 html_escape_table = {
     "&": "&amp;",
     '"': "&quot;",
+    '“': "&quot;",
+    '”': "&quot;",
     "'": "&apos;",
     "’": "&apos;",
     ">": "&gt;",
     "<": "&lt;",
+    "-": "&ndash;",
+    "–": "&ndash;"
 }
-
-# def randomword(length):
-#     letters = string.ascii_lowercase
-#     return ''.join(random.choice(letters) for i in range(length))
-
 
 today = datetime.date.today()
 notification_date = today - datetime.timedelta(days=notification_period)
 notification_epoch = date_to_epoch("%s 00:00:00" % notification_date)
-
-
-if os.path.exists(image_path):
-    shutil.rmtree(image_path, ignore_errors=True)
-
-if not os.path.exists(image_path):
-    os.makedirs(image_path)
 
 plex = PlexServer(base_url, token)
 recent = plex.library.recentlyAdded()
@@ -52,19 +37,28 @@ recent_items = []
 for video in recent:
     if video.type == "movie" and date_to_epoch(video.addedAt) > notification_epoch:
         recent_item = {}
-        urllib.request.urlretrieve(video.thumbUrl, "%s/poster.jpeg" % image_path)
-        #movie_data = plex.library.section('Movies').get(video.title)
-        with open("%s/poster.jpeg" % image_path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
-
         recent_item['title'] = video.title
-        #recent_item['year'] = movie_data.year
-        recent_item['poster_base64'] = encoded_string.decode('utf-8')
+        #  This allows movie posters to be loaded
+        recent_item['poster_url'] = video.thumbUrl.replace('https://', 'http://')
+        recent_item['description'] = "".join(html_escape_table.get(c, c) for c in video.summary)
         recent_items.append(recent_item)
 
 f = open("plex_email.html", "w+")
-f.write("<html><body style=\"font-family:sans-serif;\"><table>")
+f.write('<html>\n  <head>\n    <style>\n%s\n    </style>\n  </head>' % open('email.css', 'r').read())
+f.write('  <body>\n    <div class="content">\n      <h1>Now Streaming:</h1>')
 for item in recent_items:
-    f.write("<tr><td><img src=\"data:image/png;base64,%s\" height=\"450px\" width=\"300px\"/></td>" % item['poster_base64'])
-    f.write("<td valign=\"top\"><h2>%s</h2></td></tr>\n" % item['title'])
-f.write("</table></body></html>")
+    #  Create a card for the movie
+    f.write('        <div class="card">\n')
+    # Start with the movie poster
+    f.write('          <img class="poster" src="%s"  alt="%s movie poster"/>\n' % (item['poster_url'], item['title']))
+    #  Add a <div> to hold the text-based data
+    f.write('          <div class="info-cell">\n')
+    #  Add the Title as a <h2>, and the movie summary
+    f.write('            <h2>%s</h2>\n            %s\n' % (item['title'], item['description']))
+    #  Wrap it up like a fajita
+    f.write('          </div>\n')
+    f.write('        </div>\n')
+f.write('    </div>\n  </body>\n</html>')
+
+
+
