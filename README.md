@@ -6,7 +6,10 @@ recently added.
 The tool will find all the new items in a single library section and format their data into an email that can also be 
 automatically distributed 
 
+![Email Sample](docs/images/email_covershot.png?raw=true "Email Sample")
+
 ## To Do
+
 - [ ] Fully document tool
 - [ ] Pull the user list from the server API
 - [ ] User white/black lists
