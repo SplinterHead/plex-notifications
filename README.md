@@ -8,8 +8,24 @@ automatically distributed
 
 ![Email Sample](docs/images/email_covershot.png?raw=true "Email Sample")
 
+## Setup
+
+#### GMail account
+
+First, a Gmail account will be needed for this to work - it is recommended to set up a new account specifically or this, or
+for all system related messaging, due to security requirements.
+
+[Go ahead and create one here](https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp)
+
+#### Environment Variables
+
+Now that the Gmail account is sorted, the credentials for that and the Plex server itself need to be added to the environment
+
+Set two environment variables
+
 ## To Do
 
+- [x] Get Plex server credentials from environment variables
 - [ ] Fully document tool
 - [ ] Pull the user list from the server API
 - [ ] User white/black lists
