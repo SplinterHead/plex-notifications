@@ -2,11 +2,13 @@ import os
 import time
 import datetime
 import emailer
+from plexapi.myplex import MyPlexAccount
 from plexapi.server import PlexServer
 
 defaults = {
     'base_url':   os.environ['PLEX_URL'],
-    'token':      os.environ['PLEX_TOKEN'],
+    'plex_user':  os.environ['PLEX_USER'],
+    'plex_pass':  os.environ['PLEX_PASS'],
     'gmail_addr': os.environ['GMAIL_USERNAME'],
     'gmail_pass': os.environ['GMAIL_PASSWORD']
 }
@@ -38,8 +40,17 @@ today = datetime.date.today()
 notification_date = today - datetime.timedelta(days=notification_period)
 notification_epoch = date_to_epoch("%s 00:00:00" % notification_date)
 
-plex = PlexServer(defaults['base_url'], defaults['token'])
-recent = plex.library.recentlyAdded()
+print("Logging into Plex as %s" % defaults['plex_user'])
+plexAccount = MyPlexAccount(defaults['plex_user'], defaults['plex_pass'])
+plexServer = PlexServer(defaults['base_url'], plexAccount._token)
+
+recent = plexServer.library.recentlyAdded()
+user_emails = [plexAccount.email]
+users = plexAccount.users()
+for user in users:
+    user_emails.append(user.email)
+
+print("Email recipients: %s" % ', '.join(user_emails))
 
 recent_items = []
 for video in recent:
@@ -67,8 +78,9 @@ for item in recent_items:
     f.write('          </div>\n')
     f.write('        </div>\n')
 f.write('    </div>\n  </body>\n</html>')
+f.close()
 
 print("Sending email")
 # TODO: Get the server name from the API
-emailer.send_email(defaults, 'plex-server')
+emailer.send_email(defaults, plexServer.friendlyName, ', '.join(user_emails))
 print("Complete")
