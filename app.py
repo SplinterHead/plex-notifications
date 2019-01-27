@@ -17,6 +17,8 @@ defaults = {
     'notification_period':  int(config['general']['NOTIFICATION_PERIOD'])
 }
 
+plex_local_url = "http://localhost:32400"
+
 
 def date_to_epoch(timestamp):
     pattern = '%Y-%m-%d %H:%M:%S'
@@ -45,7 +47,7 @@ notification_epoch = date_to_epoch("%s 00:00:00" % notification_date)
 
 print("Logging into Plex as %s" % defaults['plex_user'])
 plexAccount = MyPlexAccount(defaults['plex_user'], defaults['plex_pass'])
-plexServer = PlexServer(defaults['base_url'], plexAccount._token)
+plexServer = PlexServer(plex_local_url, plexAccount._token)
 
 recent = plexServer.library.recentlyAdded()
 user_emails = [plexAccount.email]
@@ -61,7 +63,7 @@ for video in recent:
         recent_item = {}
         recent_item['title'] = "".join(html_escape_table.get(c, c) for c in video.title)
         #  This allows movie posters to be loaded
-        recent_item['poster_url'] = video.thumbUrl.replace('https://', 'http://')
+        recent_item['poster_url'] = video.thumbUrl.replace(plex_local_url, defaults['base_url'])
         recent_item['description'] = "".join(html_escape_table.get(c, c) for c in video.summary)
         recent_items.append(recent_item)
 
@@ -85,5 +87,5 @@ f.close()
 
 print("Sending email")
 # TODO: Get the server name from the API
-emailer.send_email(defaults, plexServer.friendlyName, 'lewis2004@hotmail.com')
+emailer.send_email(defaults, plexServer.friendlyName, user_emails)
 print("Complete")

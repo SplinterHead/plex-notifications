@@ -11,25 +11,35 @@ header_messages = [
     "Don't know what to watch?"
 ]
 
+# Use this list to block sending emails to certain users
+user_blacklist = []
+
 
 def send_email(defaults, server_name, recipients):
-    smtp = smtplib.SMTP(host='smtp.gmail.com', port=587)
-    smtp.ehlo()
-    smtp.starttls()
-    smtp.login(defaults['gmail_addr'], defaults['gmail_pass'])
+    for person in recipients:
+        print("Evaluating %s" % person)
 
-    msg = MIMEMultipart('alternative')
-    msg["From"] = 'Plex %s <%s>' % (server_name, defaults['gmail_addr'])
-    msg["To"] = recipients
-    msg["Subject"] = random.choice(header_messages)
-    msg.preamble = "See what's been added to Plex this week"
-    msg.add_header('Content-Type', 'text/html')
+        if person in user_blacklist:
+            print("- User in blacklist, not sending")
+        else:
+            print("- User not in blacklist, continuing")
+            smtp = smtplib.SMTP(host='smtp.gmail.com', port=587)
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.login(defaults['gmail_addr'], defaults['gmail_pass'])
 
-    text_msg = MIMEText("See what's been added to Plex this week", 'plain', 'utf-8')
-    html_msg = MIMEText(open('plex_email.html', 'r').read(), 'html', 'utf-8')
+            msg = MIMEMultipart('alternative')
+            msg["From"] = 'Plex %s <%s>' % (server_name, defaults['gmail_addr'])
+            msg["To"] = person
+            msg["Subject"] = random.choice(header_messages)
+            msg.preamble = "See what's been added to Plex this week"
+            msg.add_header('Content-Type', 'text/html')
 
-    msg.attach(text_msg)
-    msg.attach(html_msg)
+            text_msg = MIMEText("See what's been added to Plex this week", 'plain', 'utf-8')
+            html_msg = MIMEText(open('plex_email.html', 'r').read(), 'html', 'utf-8')
 
-    smtp.send_message(msg)
-    smtp.quit()
+            msg.attach(text_msg)
+            msg.attach(html_msg)
+
+            smtp.send_message(msg)
+            smtp.quit()

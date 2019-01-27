@@ -79,7 +79,7 @@ crontab -e
 - [ ] Only send emails if new items have been added
 - [x] Fully document tool
 - [x] Pull the user list from the server API
-- [ ] User white/black lists
+- [x] User white/black lists
 - [ ] Convert tool to a full plugin
 - [ ] Make all the options (inc. library name) configurable
 - [ ] Allow multiple libraries
