@@ -67,6 +67,12 @@ for video in recent:
         recent_item['description'] = "".join(html_escape_table.get(c, c) for c in video.summary)
         recent_items.append(recent_item)
 
+# Make sure that we are only sending out the email when there is something to notify about
+print("There are %s new movies this week" % len(recent_items))
+if len(recent_items) < 1:
+    print("As there are no movies, no email will be sent. Quitting")
+    exit()
+
 f = open("plex_email.html", "w+")
 f.write('<html>\n  <head>\n    <style>\n%s\n    </style>\n  </head>' % open('email.css', 'r').read())
 f.write('  <body>\n    <div class="content">\n      <h1>Now Streaming:</h1>')
@@ -86,6 +92,5 @@ f.write('    </div>\n  </body>\n</html>')
 f.close()
 
 print("Sending email")
-# TODO: Get the server name from the API
 emailer.send_email(defaults, plexServer.friendlyName, user_emails)
 print("Complete")
