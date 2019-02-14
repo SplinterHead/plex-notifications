@@ -21,31 +21,28 @@ for all system related messaging, due to security requirements.
 
 #### Plex server Remote Access
 
-For this to work, the Plex server needs to be available externally. This can be done by following the instructions on the 
+For these emails to work, the Plex server needs to be available externally. This can be done by following the instructions on the
 [Plex Website](https://support.plex.tv/articles/200289506-remote-access/)
 
-#### Environment Variables
+#### Configuration File
 
-**There is an example script called `run.sh` which will speed up the set up of the env vars, sourcing the virtualenv and running the tool**
+Inputs to this tool are set up in the `plex-notifications.ini` configuration file. Fill in the fields in the supplied file
 
-First, we need to know about the server that this tool will run against
+```
+[general]
+NOTIFICATION_PERIOD     # Number of days to look back into library history
+EMAIL_BLACKLIST         # List of users' emails that do not want to get emails
 
-```bash
-# Plex credentials
-export PLEX_URL=""  # External Plex server address and port (eg. http://my.plex.server:32400)
-export PLEX_USER="" # Plex admin user username
-export PLEX_PASS="" # Plex admin user password
+[plex]
+PLEX_URL                # External URL (with port) to the Plex Server
+PLEX_USER               # Admin Plex username
+PLEX_PASS               # Admin Plex user password
+
+[gmail]
+GMAIL_USERNAME          # Email address of the GMail account
+GMAIL_PASSWORD          # Password for the GMail account
 ```
 
-Now that the Gmail account is sorted, the credentials for that and the Plex server itself need to be added to the environment
-
-Set two environment variables
-
-```bash
-# Gmail credentials
-export GMAIL_USERNAME="" # Gmail address
-export GMAIL_PASSWORD="" # Gmail password
-```
 
 #### Dependencies
 
@@ -76,11 +73,11 @@ crontab -e
 ## To Do
 
 - [x] Get Plex server credentials from environment variables
-- [ ] Only send emails if new items have been added
+- [x] Only send emails if new items have been added
 - [x] Fully document tool
 - [x] Pull the user list from the server API
 - [x] User white/black lists
-- [ ] Convert tool to a full plugin
 - [ ] Make all the options (inc. library name) configurable
 - [ ] Allow multiple libraries
+- [ ] Convert tool to a full plugin
 - [ ] Link to item in Plex (?)
